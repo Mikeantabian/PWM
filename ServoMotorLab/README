@@ -1,1 +1,170 @@
+# Table of Contents
+
+1. [Task 1: RGB LED Control](#task-1-rgb-led-control)
+   - [Objective](#objective)
+   - [PWM Configuration](#pwm-configuration)
+   - [Clock Setup](#clock-setup)
+   - [GPIO Configuration](#gpio-configuration)
+   - [Main Loop](#main-loop)
+   - [PWM Output](#pwm-output)
+   - [Indicator LEDs](#indicator-leds)
+   - [Delay Function](#delay-function)
+
+2. [Task 2: Breathing Effect](#task-2-breathing-effect)
+   - [Introduction](#introduction)
+   - [PWM Duty Cycle Modulation](#pwm-duty-cycle-modulation)
+   - [Loop Structure](#loop-structure)
+   - [PWM Period](#pwm-period)
+   - [Visual Impact](#visual-impact)
+
+3. [Task 3: Servo Motor Rotation](#task-3-servo-motor-rotation)
+   - [Overview](#overview)
+   - [Servo Motor Control](#servo-motor-control)
+   - [Challenges and Adjustments](#challenges-and-adjustments)
+   - [Visual Representation](#visual-representation)
+
+4. [Task 4: Variable Speed Servo Motor](#task-4-variable-speed-servo-motor)
+   - [Enhanced PWM Configuration](#enhanced-pwm-configuration)
+   - [Dynamic Speed Adjustment](#dynamic-speed-adjustment)
+   - [PWM Pulse Width Modulation](#pwm-pulse-width-modulation)
+   - [User-Defined Speed Levels](#user-defined-speed-levels)
+
+
+# Task 1: RGB LED Control
+
+## Objective
+
+In Task 1, the goal is to control the brightness of an RGB LED using Pulse Width Modulation (PWM) on the TM4C123GH6PM LaunchPad Board. The RGB LED comprises three color components: red, green, and blue. The brightness of each color is independently controlled through PWM, resulting in a broad spectrum of colors.
+
+## PWM Configuration
+
+The code configures PWM on PWM1, specifically on Generator 3 (`PWM1->_3`).
+- PWM is set to output high when the load is reached and low when the comparator matches, creating a PWM signal.
+
+## Clock Setup
+
+- The clock to PWM1 is enabled to allow its operation.
+- Clock dividers are adjusted to achieve stable PWM operation.
+
+## GPIO Configuration
+
+- GPIO pins for RGB LED control are configured.
+- Port F (`GPIOF`) is used for controlling the RGB LED.
+- Pin `PF2` is configured as an output pin for controlling the blue LED component.
+- Alternate function is enabled for `PF2` to allow PWM control.
+
+## Main Loop
+
+- The main loop continuously reads the state of pushbuttons connected to GPIO Port D (`GPIOD`).
+- Different pushbutton states correspond to different duty cycles, adjusting the brightness of the blue LED.
+- A switch-case statement determines the duty cycle based on the pushbutton state, ranging from 100% to 35%.
+
+## PWM Output
+
+- The `FindDutyCycle` function calculates the duty cycle in terms of load and sets the PWM comparator accordingly.
+- The PWM output is connected to the blue LED, and the varying duty cycle results in different levels of brightness.
+
+## Indicator LEDs
+
+- GPIO Port B (`GPIOB`) is configured to control LED indicators.
+- Indicator LEDs on Port B show the selected duty cycle, providing visual feedback.
+
+## Delay Function
+
+- The `delayMs` function introduces a delay to control the speed of the main loop, allowing smooth transitions between duty cycles.
+
+
+# Task 2: Breathing Effect
+
+## Introduction
+
+Task 2 introduces a captivating breathing effect to the RGB LED, enhancing its visual appeal. The code achieves this effect through the modulation of the PWM duty cycle using nested for loops. Here's a breakdown of the key components:
+
+## PWM Duty Cycle Modulation
+
+The primary focus is on smoothly transitioning the LED brightness between low and high levels, simulating a breathing pattern.
+- Nested for loops are employed to increment and decrement the PWM duty cycle gradually.
+- This modulation introduces a gradual change in brightness, creating a visually pleasing breathing effect.
+
+## Loop Structure
+
+- The outer loop controls the number of breathing cycles, determining how many times the LED brightness transitions from low to high and vice versa.
+- The inner loops increment and decrement the PWM duty cycle within each breathing cycle, contributing to the gradual rise and fall of LED brightness.
+
+## PWM Period
+
+- The overall effect is achieved by modifying the PWM duty cycle, representing the percentage of time the LED is in the "on" state during a complete PWM period.
+- As the duty cycle increases, the LED brightness rises, and as it decreases, the LED brightness diminishes.
+
+## Visual Impact
+
+The result is a smooth and visually appealing breathing effect where the LED appears to softly glow, imitating a breathing motion.
+- The nested loops provide a controlled and gradual transition, highlighting the versatility of PWM in producing dynamic and aesthetically pleasing LED behaviors.
+
+
+# Task 3: Servo Motor Rotation
+
+## Overview
+
+Task 3 focuses on leveraging Pulse Width Modulation (PWM) to control the rotation of a servo motor within a specified range of -90 to 90 degrees. Here's a simplified overview:
+
+## Servo Motor Control
+
+- PWM signals are employed to regulate the position of the servo motor, facilitating smooth rotation.
+- The primary goal is to set PWM pulse width values corresponding to -90 and 90 degrees, ensuring precise control over the servo's movement.
+
+## Challenges and Adjustments
+
+- During implementation, challenges were encountered in fine-tuning the PWM pulse width values for accurate servo motor control.
+- Adjustments were made to address calibration issues, ensuring the servo rotates precisely to the desired angles without overshooting or undershooting.
+
+## Visual Representation
+
+- The servo motor's controlled rotation visually demonstrates the precision and flexibility offered by PWM in positioning mechanical components.
+- This task lays the groundwork for applications where servo motors play a key role in achieving specific mechanical movements.
+
+
+
+# Task 4: Variable Speed Servo Motor
+
+Task 4 expands upon servo motor control from Task 3 by introducing variable speed functionality. Here's an in-depth look at the register-level details:
+
+## Enhanced PWM Configuration:
+
+```c
+PWM1->_3_CTL = 0;                       // Disable PWM1_2 during configuration
+PWM1->_3_GENB = 0x0000080C;             // Set output high when load, low when match
+PWM1->_3_LOAD = 62500 - 1;              // Set LOAD based on desired frequency
+
+## Dynamic Speed Adjustment:
+
+Pushbuttons on GPIO ports (e.g., Port D) are configured as inputs, allowing users to select different speed levels.
+
+```c
+SYSCTL->RCGCGPIO |= 0x08;               // Enable clock to PORTD
+GPIOD->DEN |= 0x0F;                     // Enable digital functionality for PD3-PD0
+GPIOD->DIR &= ~0x0F;                    // Set PD3-PD0 as input pins for pushbuttons
+
+## PWM Pulse Width Modulation:
+
+The heart of servo motor control lies in adjusting the Pulse Width Modulation (PWM) pulse width based on user-selected speed levels. In the provided code snippet:
+
+```c
+int pw;                                 // Initialize variable for pulse width
+
+## User-Defined Speed Levels:
+
+The code segments associated with each speed level are controlled by the state of pushbuttons. In the following code snippet:
+
+```c
+switch(data) {
+    case 1:                             // User selects Speed Level 1
+        delay = 1;
+        break;
+    case 2:                             // User selects Speed Level 2
+        delay = 15;
+        break;
+    // ... Continue for other speed levels
+}
+
 
